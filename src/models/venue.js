@@ -3,7 +3,15 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Venue extends Model {
     static associate(models) {
-      // Associations are defined in models/index.js
+      Venue.belongsTo(models.User, {
+        foreignKey: 'providerId',
+        as: 'provider'
+      });
+      
+      Venue.hasMany(models.Quote, {
+        foreignKey: 'venueId',
+        as: 'quotes'
+      });
     }
   }
   

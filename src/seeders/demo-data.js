@@ -8,40 +8,53 @@ async function seedDatabase() {
     // Clear existing data
     await db.sequelize.sync({ force: false });
 
-    // Create users
+    // Create users with findOrCreate to avoid duplicates
     const hashedPassword = await bcrypt.hash('password123', 12);
 
     // Admin user
-    const admin = await db.User.create({
-      firstName: 'Admin',
-      lastName: 'User',
-      email: 'admin@eventplanner.com',
-      password: hashedPassword,
-      role: 'admin',
-      phone: '+1234567890'
+    const [admin] = await db.User.findOrCreate({
+      where: { email: 'admin@eventplanner.com' },
+      defaults: {
+        firstName: 'Admin',
+        lastName: 'User',
+        email: 'admin@eventplanner.com',
+        password: hashedPassword,
+        role: 'admin',
+        phone: '+1234567890'
+      }
     });
 
     // Organizer user
-    const organizer = await db.User.create({
-      firstName: 'John',
-      lastName: 'Organizer',
-      email: 'organizer@eventplanner.com',
-      password: hashedPassword,
-      role: 'organizer',
-      phone: '+1234567891'
+    const [organizer] = await db.User.findOrCreate({
+      where: { email: 'organizer@eventplanner.com' },
+      defaults: {
+        firstName: 'John',
+        lastName: 'Organizer',
+        email: 'organizer@eventplanner.com',
+        password: hashedPassword,
+        role: 'organizer',
+        phone: '+1234567891'
+      }
     });
 
     // Provider user
-    const provider = await db.User.create({
-      firstName: 'Jane',
-      lastName: 'Provider',
-      email: 'provider@eventplanner.com',
-      password: hashedPassword,
-      role: 'provider',
-      phone: '+1234567892'
+    const [provider] = await db.User.findOrCreate({
+      where: { email: 'provider@eventplanner.com' },
+      defaults: {
+        firstName: 'Jane',
+        lastName: 'Provider',
+        email: 'provider@eventplanner.com',
+        password: hashedPassword,
+        role: 'provider',
+        phone: '+1234567892'
+      }
     });
 
     console.log('✅ Users created');
+
+    // Delete all existing venues to add new ones
+    await db.Venue.destroy({ where: {} });
+    console.log('🗑️ Existing venues cleared');
 
     // Create venues
     const venues = [
@@ -98,6 +111,83 @@ async function seedDatabase() {
         pricePerDay: 2800.00,
         amenities: 'Historic charm, beautiful grounds, valet parking',
         images: JSON.stringify(['mansion1.jpg', 'mansion2.jpg']),
+        providerId: provider.id
+      },
+      {
+        name: 'Lakeside Lodge',
+        description: 'Rustic lodge with beautiful lake views and outdoor activities',
+        address: '987 Lake Road',
+        city: 'Denver',
+        capacity: 80,
+        pricePerDay: 1500.00,
+        amenities: 'Lake access, fire pit, outdoor games, catering kitchen',
+        images: JSON.stringify(['lodge1.jpg', 'lodge2.jpg']),
+        providerId: provider.id
+      },
+      {
+        name: 'Art Gallery Loft',
+        description: 'Modern artistic space perfect for creative events',
+        address: '246 Arts District',
+        city: 'San Francisco',
+        capacity: 60,
+        pricePerDay: 1200.00,
+        amenities: 'Art displays, modern lighting, sound system',
+        images: JSON.stringify(['gallery1.jpg', 'gallery2.jpg']),
+        providerId: provider.id
+      },
+      {
+        name: 'Beach Club',
+        description: 'Oceanfront venue with beach access and sunset views',
+        address: '135 Ocean Drive',
+        city: 'San Diego',
+        capacity: 180,
+        pricePerDay: 3500.00,
+        amenities: 'Beach access, ocean views, bar service, outdoor seating',
+        images: JSON.stringify(['beach1.jpg', 'beach2.jpg']),
+        providerId: provider.id
+      },
+      {
+        name: 'Industrial Warehouse',
+        description: 'Trendy converted warehouse space for modern events',
+        address: '789 Industrial Way',
+        city: 'Portland',
+        capacity: 250,
+        pricePerDay: 2000.00,
+        amenities: 'Open space, exposed brick, loading dock access, flexible layout',
+        images: JSON.stringify(['warehouse1.jpg', 'warehouse2.jpg']),
+        providerId: provider.id
+      },
+      {
+        name: 'Country Club',
+        description: 'Elegant country club with golf course views',
+        address: '456 Golf Course Drive',
+        city: 'Dallas',
+        capacity: 220,
+        pricePerDay: 4000.00,
+        amenities: 'Golf course views, full service bar, valet parking, professional kitchen',
+        images: JSON.stringify(['country1.jpg', 'country2.jpg']),
+        providerId: provider.id
+      },
+      {
+        name: 'Mountain Lodge',
+        description: 'Scenic mountain retreat perfect for intimate gatherings',
+        address: '321 Mountain View Road',
+        city: 'Aspen',
+        capacity: 40,
+        pricePerDay: 1800.00,
+        amenities: 'Mountain views, fireplace, rustic decor, outdoor deck',
+        images: JSON.stringify(['mountain1.jpg', 'mountain2.jpg']),
+        providerId: provider.id
+      },
+      {
+        name: 'Urban Penthouse',
+        description: 'Luxury penthouse venue in the heart of the city',
+        address: '654 Downtown Plaza',
+        city: 'Seattle',
+        capacity: 90,
+        pricePerDay: 3800.00,
+        amenities: 'City skyline views, modern amenities, private elevator, premium bar',
+        images: JSON.stringify(['penthouse1.jpg', 'penthouse2.jpg']),
         providerId: provider.id
       }
     ];

@@ -3,7 +3,18 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Quote extends Model {
     static associate(models) {
-      // Associations are defined in models/index.js
+      Quote.belongsTo(models.Event, {
+        foreignKey: 'eventId',
+        as: 'event'
+      });
+      Quote.belongsTo(models.Venue, {
+        foreignKey: 'venueId',
+        as: 'venue'
+      });
+      Quote.belongsTo(models.User, {
+        foreignKey: 'providerId',
+        as: 'provider'
+      });
     }
   }
   
@@ -18,7 +29,7 @@ export default (sequelize, DataTypes) => {
     },
     venueId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'Venues',
         key: 'id'
@@ -34,8 +45,7 @@ export default (sequelize, DataTypes) => {
     },
     items: {
       type: DataTypes.TEXT,
-      allowNull: false,
-      defaultValue: '[]'
+      allowNull: false
     },
     subtotal: {
       type: DataTypes.DECIMAL(10, 2),
@@ -43,20 +53,21 @@ export default (sequelize, DataTypes) => {
     },
     vat: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false
+      allowNull: true,
+      defaultValue: 0
     },
     total: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('draft', 'sent', 'accepted', 'rejected', 'negotiating'),
+      type: DataTypes.ENUM('draft', 'sent', 'accepted', 'rejected', 'expired', 'negotiating'),
       allowNull: false,
       defaultValue: 'draft'
     },
     validUntil: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: true
     }
   }, {
     sequelize,
