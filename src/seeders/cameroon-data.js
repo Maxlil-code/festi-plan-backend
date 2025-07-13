@@ -1,17 +1,71 @@
 import db from '../models/index.js';
+import bcrypt from 'bcrypt';
 
 async function seedCameroonData() {
   try {
     console.log('🇨🇲 Starting Cameroon context database seeding...');
 
-    // Get existing users (we assume they exist)
-    const organizers = await db.User.findAll({ where: { role: 'organizer' } });
-    const providers = await db.User.findAll({ where: { role: 'provider' } });
+    // First ensure database connection
+    await db.sequelize.authenticate();
+    console.log('✅ Database connected');
 
-    if (organizers.length === 0 || providers.length === 0) {
-      console.log('⚠️ Please seed users first before running this seeder');
-      return;
-    }
+    // Create users if they don't exist
+    const hashedPassword = await bcrypt.hash('password123', 12);
+
+    // Create organizers
+    const [organizer1] = await db.User.findOrCreate({
+      where: { email: 'organizer1@eventcameroon.com' },
+      defaults: {
+        firstName: 'Jean',
+        lastName: 'Mbarga',
+        email: 'organizer1@eventcameroon.com',
+        password: hashedPassword,
+        role: 'organizer',
+        phone: '+237690123456'
+      }
+    });
+
+    const [organizer2] = await db.User.findOrCreate({
+      where: { email: 'organizer2@eventcameroon.com' },
+      defaults: {
+        firstName: 'Marie',
+        lastName: 'Nkomo',
+        email: 'organizer2@eventcameroon.com',
+        password: hashedPassword,
+        role: 'organizer',
+        phone: '+237690123457'
+      }
+    });
+
+    // Create providers
+    const [provider1] = await db.User.findOrCreate({
+      where: { email: 'provider1@eventcameroon.com' },
+      defaults: {
+        firstName: 'Paul',
+        lastName: 'Biya',
+        email: 'provider1@eventcameroon.com',
+        password: hashedPassword,
+        role: 'provider',
+        phone: '+237690123458'
+      }
+    });
+
+    const [provider2] = await db.User.findOrCreate({
+      where: { email: 'provider2@eventcameroon.com' },
+      defaults: {
+        firstName: 'Aminata',
+        lastName: 'Diallo',
+        email: 'provider2@eventcameroon.com',
+        password: hashedPassword,
+        role: 'provider',
+        phone: '+237690123459'
+      }
+    });
+
+    const organizers = [organizer1, organizer2];
+    const providers = [provider1, provider2];
+
+    console.log(`✅ Users ready: ${organizers.length} organizers, ${providers.length} providers`);
 
     // Clear existing data (except users)
     await db.Quote.destroy({ where: {} });
