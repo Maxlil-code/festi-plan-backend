@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "seed": "node src/seeders/demo-data.js",
+    "seed:cameroon": "node src/seeders/cameroon-data.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
